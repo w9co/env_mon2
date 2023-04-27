@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Fairbanks OIT Weather</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    .card-img-top {
+      height: 80px;
+      width: 80px;
+      margin: 25px;
+    }
+    .card, .latest-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+  
+<body class="container-fluid">
+  <center class="row">
+    <h1>Fairbanks OIT Weather</h1>
+  </center>
+  <hr />
+  <div class="row latest-container">
+    <div class="col-md-3">
+      <div class="card">
+        <img class="card-img-top" src="{% static 'img/icon-temp.svg' %}" alt="Temp image">
+        <div class="card-body">
+        <h4 class="card-title">Temperature</h4>
+        <div class="card-text">
+          <span id="temp_txt" style="font-size: 36px; text-align: center; color: darkgrey;">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <img class="card-img-top" src="{% static '/img/icon-humidity.svg' %}" alt="Humidity image">
+      <div class="card-body">
+        <h4 class="card-title">Humidity</h4>
+        <div class="card-text">
+          <span id="humidity_txt" style="font-size: 36px; text-align: center; color: darkgrey;">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <img class="card-img-top" src="{% static '/img/icon-pressure.svg' %}" alt="Barometric Pressure image">
+      <div class="card-body">
+        <h4 class="card-title">Barometric Pressure</h4>
+        <div class="card-text">
+          <span id="pressure_txt" style="font-size: 36px; text-align: center; color: darkgrey;">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr/>
+  <div class="row" style="display: flex; justify-content: center; align-items: center;">
+    <div class="col-md-10">
+      <canvas id="all_data"></canvas>
+    </div>
+  </div>
+  <div class="row" style="display: flex; justify-content: center; align-items: center;">
+    <div class="col-md-10">
+      <canvas id="all_data_dj"></canvas>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <script>
+    var endpoint = '/api';
+
+    $.ajax({
+      method: "GET",
+      url: endpoint,
+      success: function(data) {
+        drawAllGraph(data, 'all_data');
+      },
+      error: function(error_data) {
+        console.log(error_data);
+      }
+    })
+
+    function drawAllGraph(data, id) {
+      var labels = data.temp_labels;
+      var temp_chart_label = data.temp_chart_label;
+      var humidity_chart_label = data.humidity_chart_label;
+      var pressure_chart_label = data.pressure_chart_label;
+      var temp_chart_data = data.temp_chart_data;
+      var humidity_chart_data = data.humidity_chart_data;
+      var pressure_chart_data = data.pressure_chart_data;
+      var pressureBgC = '#00a10596';
+      var pressureBC = '#006003';
+      var humidityBgC = '#2196f39e';
+      var humidityBC = '#0074d1';
+      var tempBgC = '#b76d7e7a';
+      var tempBC = '#971111';
+      var ctx = document.getElementById(id).getContext('2d');
+      var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: pressure_chart_label,
+            backgroundColor: pressureBgC,
+            borderColor: pressureBC,
+            data: pressure_chart_data,
+          }, {
+            label: humidity_chart_label,
+            backgroundColor: humidityBgC,
+            borderColor: humidityBC,
+            data: humidity_chart_data,
+          }, {
+            label: temp_chart_label,
+            backgroundColor: tempBgC,
+            borderColor: tempBC,
+            data: temp_chart_data,
+          }]
+        },
+        options: {
+          responsive: true
+          //scales: {
+          //  xAxes: [{
+          //    display: true
+          //  }],
+          //  yAxes: [{
+          //    ticks: {
+          //      beginAtZero: false 
+          //    }
+          //  }]
+          //}
+        }
+      });
+    }
+
+    drawAllGraphDj('all_data_dj');
+
+    function drawAllGraphDj(id) {
+      var ctx = document.getElementById(id).getContext('2d');
+      var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: {{ labels|safe }},
+          datasets: [{
+            label: 'Barometric Pressure',
+            backgroundColor: '#00a10596',
+            borderColor: '#006003',
+            data: {{ pressure_chart_data|safe }},
+          }, {
+            label: 'Humidity',
+            backgroundColor: '#2196f39e',
+            borderColor: '#0074d1',
+            data: {{ humidity_chart_data|safe }},
+          }, {
+            label: 'Temperature',
+            backgroundColor: '#b76d7e7a',
+            borderColor: '#971111',
+            data: {{ temp_chart_data|safe }},
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+  </script>
+</body>
+</html>

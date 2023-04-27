@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Fairbanks OIT Hallway Weather</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/solid.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/fontawesome.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+
+  <style>
+    .content {
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+
+    .card-img-top {
+      height: 80px;
+      width: 80px;
+      margin: 25px;
+    }
+
+    .card, .latest-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      text-align: center;
+    }
+
+    .curr-stat {
+      font-size: 36px;
+      text-align: center;
+      color: darkgrey;
+    }
+
+    .curr-meas {
+      font-size: 22px;
+      vertical-align: top;
+      color: darkgrey;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+  
+<body class="container-fluid">
+  <div class="content">
+    <center class="row" style="margin-top: 10px;">
+      <h1>Fairbanks OIT Hallway Weather</h1>
+    </center>
+    <hr />
+    <div class="row latest-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+      <div class="col-md-3">
+        <div class="card">
+          <img class="card-img-top" src="{% static 'img/icon-temp.svg' %}" alt="Temp image">
+          <div class="card-body">
+            <h5 class="card-title">Temperature</h5>
+            <div class="card-text">
+              <span id="temp_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_temp }}</span><span class="curr-meas">&#176;F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img class="card-img-top" src="{% static '/img/icon-humidity.svg' %}" alt="Humidity image">
+          <div class="card-body">
+            <h5 class="card-title">Humidity</h5>
+            <div class="card-text">
+              <span id="humidity_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_humidity }}</span><span class="curr-meas">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img class="card-img-top" src="{% static '/img/icon-pressure.svg' %}" alt="Barometric Pressure image">
+          <div class="card-body">
+            <h5 class="card-title">Barometric Pressure</h5>
+            <div class="card-text">
+              <span id="pressure_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_pressure }}</span><span class="curr-meas">inHg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr/>
+    <form class="row gy-2 gx-3 align-items-center" method="GET" action="/"> <div class="col-sm-3"></div>
+      <div class="col-sm-3">
+        <label for="id_start_date" class="form-label">Start Date/Time</label>
+        <div class="input-group" id="start_date_grp" placeholder="Start Date/Time"
+          data-td-target-input="nearest" data-td-target-toggle="nearest">
+          {{ form.start_date }}
+          <span class="input-group-text" data-td-target="#id_start_date" data-td-toggle="datetimepicker">
+            <span class="fa-solid fa-calendar"></span>
+          </span>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <label for="id_end_date" class="form-label">End Date/Time</label>
+        <div class="input-group" id="end_date_grp" data-td-target-input="nearest" data-td-target-toggle="nearest">
+          {{ form.end_date }}
+          <span class="input-group-text" data-td-target="#id_end_date" data-td-toggle="datetimepicker">
+            <span class="fa-solid fa-calendar"></span>
+          </span>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <input type="submit" class="btn btn-primary" style="margin-bottom: -25px;" value="Go"></input>
+      </div>
+    </form>
+
+    <div class="row" style="display: flex; justify-content: center; align-items: center;">
+      <div class="col-md-10">
+        <canvas id="stats_graph"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    new tempusDominus.TempusDominus(document.getElementById('id_start_date'));
+    new tempusDominus.TempusDominus(document.getElementById('id_end_date'));
+
+    ctx = document.getElementById('stats_graph');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+          label: 'Pressure',
+          backgroundColor: '#00a10596',
+          borderColor: '#006003',
+          fill: true,
+          data: {{ pressure_chart_data|safe }},
+        }, {
+          label: 'Humidity',
+          backgroundColor: '#2196f39e',
+          borderColor: '#0074d1',
+          fill: true,
+          data: {{ humidity_chart_data|safe }},
+        }, {
+          label: 'Temperature',
+          backgroundColor: '#b76d7e7a',
+          borderColor: '#971111',
+          fill: true,
+          data: {{ temp_chart_data|safe }},
+        }]
+      },
+      responsive: true
+    });
+  </script>
+</body>
+</html>
