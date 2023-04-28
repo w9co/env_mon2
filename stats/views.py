@@ -50,12 +50,14 @@ class Index(FormView):
             'temperature',
             'humidity',
             'pressure',
+            'outside_temp',
             named=True
         ).order_by('created')
         dates = [stat.created.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %I:%M %p') for stat in stats]
         temps = [stat.temperature.to_eng_string() for stat in stats]
         hums = [stat.humidity.to_eng_string() for stat in stats]
         press = [stat.pressure.to_eng_string() for stat in stats]
+        ext_temps = [stat.outside_temp.to_eng_string() for stat in stats]
 
         current = models.Stats.objects.latest('created')
 
@@ -68,6 +70,7 @@ class Index(FormView):
             'temp_chart_data': temps,
             'humidity_chart_data': hums,
             'pressure_chart_data': press,
+            'outside_temp_chart_data': ext_temps,
         })
 
         return context

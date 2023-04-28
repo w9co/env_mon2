@@ -146,22 +146,48 @@
           label: 'Pressure',
           backgroundColor: '#00a10596',
           borderColor: '#006003',
-          fill: true,
+          fill: false,
+          tension: .3,
+          pointStyle: false,
           data: {{ pressure_chart_data|safe }},
         }, {
           label: 'Humidity',
           backgroundColor: '#2196f39e',
           borderColor: '#0074d1',
-          fill: true,
+          fill: false,
+          tension: .3,
+          pointStyle: false,
           data: {{ humidity_chart_data|safe }},
         }, {
           label: 'Temperature',
           backgroundColor: '#b76d7e7a',
           borderColor: '#971111',
-          fill: true,
+          fill: false,
+          tension: .3,
+          pointStyle: false,
           data: {{ temp_chart_data|safe }},
+        }, {
+          label: 'Outside Temp',
+          backgroundColor: '#607d8b7a',
+          borderColor: '#607d8b',
+          fill: false,
+          tension: .3,
+          pointStyle: false,
+          data: {{ outside_temp_chart_data|safe }},
         }]
       },
+      options: {
+        scales: {
+          x: { 
+            //type: 'time',
+            ticks: {
+                autoSkip: true,
+                maxTicksLimit: 20 
+            }
+          }
+        }
+      },
+             
       responsive: true
     });
   </script>

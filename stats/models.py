@@ -8,6 +8,7 @@ class Stats(models.Model):
     temperature = models.DecimalField(max_digits=5, decimal_places=2)
     humidity = models.DecimalField(max_digits=5, decimal_places=2)
     pressure = models.DecimalField(max_digits=5, decimal_places=2)
+    outside_temp = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
         return '{} -- Temp: {}, Humidity: {}, Pressure: {}'.format(
