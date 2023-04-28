@@ -15,35 +15,29 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
 
   <style>
-    .content {
+    .graph-content {
       margin-left: 10%;
       margin-right: 10%;
-    }
-
-    .card-img-top {
-      height: 80px;
-      width: 80px;
-      margin: 25px;
-    }
-
-    .card, .latest-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: none;
-      text-align: center;
+      margin-top: 10px;
     }
 
     .curr-stat {
       font-size: 36px;
       text-align: center;
-      color: darkgrey;
+      vertical-align: middle;
+      color: lightgrey;
     }
 
     .curr-meas {
       font-size: 22px;
-      vertical-align: top;
-      color: darkgrey;
+      vertical-align: unset;
+      color: lightgrey;
+    }
+
+    .curr-lbl {
+      font-weight: 600;
+      color: black;
+      line-height: 4px;
     }
 
     form {
@@ -53,54 +47,53 @@
       border: none;
       margin-bottom: 30px;
     }
+
+    .stat-bar {
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      background-color: slategray;
+    }
+
+    .stat-img {
+      height: 80px;
+      padding: 10px;
+    }
+
   </style>
 </head>
   
 <body class="container-fluid">
   <div class="content">
-    <center class="row" style="margin-top: 10px;">
-      <h1>Fairbanks OIT Hallway Weather</h1>
+    <center class="row" style="background-color: powderblue; padding-top: 10px;">
+      <h5>Fairbanks OIT Hallway Weather</h5>
     </center>
-    <hr />
-    <div class="row latest-container">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %}
+    <div class="row stat-bar">
       <div class="col-md-3">
-        <div class="card">
-          <img class="card-img-top" src="{% static 'img/icon-temp.svg' %}" alt="Temp image">
-          <div class="card-body">
-            <h5 class="card-title">Temperature</h5>
-            <div class="card-text">
-              <span id="temp_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_temp }}</span><span class="curr-meas">&#176;F</span>
-            </div>
-          </div>
-        </div>
+        <img class="stat-img" src="{% static 'img/icon-temp.svg' %}" alt="Thermometer Image">
+        <span class="curr-stat">{{ curr_temp }}</span>
+        <span class="curr-meas">&#176;F</span>
       </div>
-      <div class="col-md-4">
-        <div class="card">
-          <img class="card-img-top" src="{% static '/img/icon-humidity.svg' %}" alt="Humidity image">
-          <div class="card-body">
-            <h5 class="card-title">Humidity</h5>
-            <div class="card-text">
-              <span id="humidity_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_humidity }}</span><span class="curr-meas">%</span>
-            </div>
-          </div>
-        </div>
+      <div class="col-md-3">
+        <img class="stat-img" src="{% static '/img/icon-humidity.svg' %}" alt="Humidity Image">
+        <span class="curr-stat">{{ curr_humidity }}</span>
+        <span class="curr-meas">%</span>
       </div>
-      <div class="col-md-4">
-        <div class="card">
-          <img class="card-img-top" src="{% static '/img/icon-pressure.svg' %}" alt="Barometric Pressure image">
-          <div class="card-body">
-            <h5 class="card-title">Barometric Pressure</h5>
-            <div class="card-text">
-              <span id="pressure_txt" class="curr-stat" style="font-size: 36px; text-align: center; color: darkgrey;">{{ curr_pressure }}</span><span class="curr-meas">inHg</span>
-            </div>
-          </div>
-        </div>
+      <div class="col-md-3">
+        <img class="stat-img" src="{% static 'img/icon-pressure.svg' %}" alt="Barometric Pressure Image">
+        <span class="curr-stat">{{ curr_pressure }}</span>
+        <span class="curr-meas">inHg</span>
       </div>
     </div>
-    <hr/>
+  </div>
+  <div class="row">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  </div>
+  <div class="graph-content">
     <form class="row gy-2 gx-3 align-items-center" method="GET" action="/"> <div class="col-sm-3"></div>
       <div class="col-sm-3">
         <label for="id_start_date" class="form-label">Start Date/Time</label>

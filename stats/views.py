@@ -66,6 +66,7 @@ class Index(FormView):
             'curr_temp': current.temperature,
             'curr_humidity': current.humidity,
             'curr_pressure': current.pressure,
+            'curr_outside_temp': current.outside_temp,
             'labels': dates,
             'temp_chart_data': temps,
             'humidity_chart_data': hums,
