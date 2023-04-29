@@ -14,6 +14,14 @@ class Index(FormView):
     template_name = 'stats/index.html'
     form_class = forms.statsSearchForm
 
+    def get_initial(self):
+        init = super().get_initial()
+        init.update({
+            'start_date':self.request.GET.get('start_date'),
+            'end_date':self.request.GET.get('end_date'),
+        })
+        return init
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = datetime.now()

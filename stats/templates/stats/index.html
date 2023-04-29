@@ -68,6 +68,10 @@
   <div class="content">
     <center class="row" style="background-color: powderblue; padding-top: 10px;">
       <h5>Fairbanks OIT Hallway Weather</h5>
+			<div class="text-end" style="margin-top: -33px;">
+				<input type="checkbox" id="auto_refresh" name="auto_refresh" value="false">
+				<label for="auto_refresh">Auto-refresh (5min)</label>
+			</div>
     </center>
     <div class="row stat-bar">
       <div class="col-md-3">
@@ -93,7 +97,7 @@
     {% endfor %}
   </div>
   </div>
-  <div class="graph-content">
+	<div class="graph-content">
     <form class="row gy-2 gx-3 align-items-center" method="GET" action="/"> <div class="col-sm-3"></div>
       <div class="col-sm-3">
         <label for="id_start_date" class="form-label">Start Date/Time</label>
@@ -127,8 +131,50 @@
   </div>
 
   <script>
+    let refreshTimeout;
+
+		// set up datepickers
     new tempusDominus.TempusDominus(document.getElementById('id_start_date'));
     new tempusDominus.TempusDominus(document.getElementById('id_end_date'));
+
+
+    function setRefreshQS(is_checked) {
+      const url = new URL(location);
+      url.searchParams.set("auto_refresh", is_checked);
+      history.pushState({}, "", url);
+    }
+    
+    function setRefreshTimeout() {
+      refreshTimeout = window.setTimeout( function() {
+        window.location.reload();
+      }, 300000); 
+    }
+
+    function clearRefreshTimeout() {
+      clearTimeout(refreshTimeout);
+    }
+
+		// auto refresh page when checked
+		const refreshChkBox = document.getElementById('auto_refresh');
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    if (params.auto_refresh === 'true') {
+      refreshChkBox.checked = true;
+      setRefreshTimeout();
+    }
+
+		refreshChkBox.addEventListener('change', e => {
+			if(e.target.checked === true) {
+        setRefreshQS(true);
+        setRefreshTimeout();
+      }
+			if(e.target.checked === false) {
+        setRefreshQS(false);
+				clearRefreshTimeout();
+			}
+		});
 
     ctx = document.getElementById('stats_graph');
     new Chart(ctx, {
