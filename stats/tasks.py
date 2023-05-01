@@ -17,6 +17,12 @@ def make_stats():
     pressure = sense.pressure * 0.0295300 # convert to Mg
     outside_temp = get_outside_temp()
 
+    # weather api call frequently fails.  Use last temp to
+    # avoid completely wrecking averages with a 0, while maintaining
+    # the dataset graph.js expects
+    if outside_temp == 0:
+        outside_temp = get_prev_outside_temp();
+
     Stats = apps.get_model('stats.Stats')
     Stats.objects.create(
         temperature = temperature,
@@ -25,6 +31,10 @@ def make_stats():
         outside_temp = outside_temp,
     )
 
+def get_prev_outside_temp():
+    Stats = apps.get_model('stats.Stats')
+    stat = Stats.objects.latest('id');
+    return stat.outside_temp
 
 def get_outside_temp():
     try:
