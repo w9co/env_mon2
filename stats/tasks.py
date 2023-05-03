@@ -54,8 +54,8 @@ def convert_to_f(temp_in_c):
 
 
 def send_alerts():
-    high_temp_threshold = 75
-    low_temp_threshold = 69
+    high_temp_threshold = settings.HIGH_TEMP_THRESHOLD
+    low_temp_threshold = settings.LOW_TEMP_THRESHOLD
     Stats = apps.get_model('stats.Stats')
     stat = Stats.objects.latest('id');
     temp = stat.temperature
