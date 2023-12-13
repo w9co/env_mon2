@@ -13,7 +13,7 @@ def make_stats():
     htemp = sense.get_temperature_from_humidity()
     avg_temp = (ptemp + htemp) / 2 # average vals from both sensors
     temperature = convert_to_f(avg_temp)
-    temp_adjustment = -7.88
+    temp_adjustment = -2.88
     temperature = temperature + temp_adjustment # adjust temperature
     humidity = sense.humidity
     pressure = sense.pressure * 0.0295300 # convert to Mg
@@ -74,5 +74,5 @@ def send_alerts():
 def start():
     scheduler = BackgroundScheduler()
     scheduler.add_job(make_stats, 'interval', minutes=10)
-    scheduler.add_job(send_alerts, 'cron', day_of_week='mon-fri', hour=6) 
+    scheduler.add_job(send_alerts, 'cron', day_of_week='mon-fri', hour=6)
     scheduler.start()
